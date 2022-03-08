@@ -1,0 +1,45 @@
+<idea-plugin>
+  <id>com.nijunyang.idea-git.code.review</id>
+  <name>idea-git code review</name>
+  <version>1.0</version>
+  <vendor email="bluedarkni@qq.com" url="https://www.xxx.com">bluedarkni</vendor>
+
+  <description><![CDATA[
+    代码检视工具。<br>
+      主要功能：<br>
+          1、 可以直接将代码检视中的问题提交到代码仓库中，目前支持gitLab<br>
+    ]]></description>
+
+  <change-notes>
+    <![CDATA[
+          代码检视工具。<br>
+      主要功能：<br>
+          1、 可以直接将代码检视中的问题提交到代码仓库中，目前支持gitLab<br>
+    ]]>
+  </change-notes>
+
+  <!-- please see https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html for description -->
+  <idea-version since-build="173.0"/>
+
+  <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
+       on how to target different products -->
+  <!--  <depends>com.intellij.modules.platform</depends>-->
+  <!--java依赖-->
+  <depends>com.intellij.modules.java</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- Add your extensions here -->
+  </extensions>
+
+  <actions>
+    <!-- Add your actions here -->
+    <action id="CodeReviewAction" class="com.nijunyang.idea.plugin.git.codereviewer.action.CodeReviewAction" text="Code Review"
+            description="Code review">
+      <!--快捷键-->
+      <keyboard-shortcut keymap="$default" first-keystroke="shift R"/>
+      <!--加到编辑菜单栏-->
+      <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+    </action>
+  </actions>
+
+</idea-plugin>
