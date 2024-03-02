@@ -36,7 +36,7 @@
     <action id="CodeReviewAction" class="com.nijunyang.idea.plugin.git.codereviewer.action.CodeReviewAction" text="Code Review"
             description="Code review">
       <!--快捷键-->
-      <keyboard-shortcut keymap="$default" first-keystroke="shift R"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt R"/>
       <!--加到编辑菜单栏-->
       <add-to-group group-id="EditorPopupMenu" anchor="first"/>
     </action>
