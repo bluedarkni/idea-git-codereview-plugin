@@ -10,15 +10,15 @@ import java.util.Vector;
  */
 public class EventInfo<E extends GitUser> {
 
-    public EventInfo(GitProject gitProject, String domain, Token token, AnActionEvent event, Vector<E> users) {
-        this.gitProject = gitProject;
+    public EventInfo(GitRepository gitRepository, String domain, Token token, AnActionEvent event, Vector<E> users) {
+        this.gitRepository = gitRepository;
         this.domain = domain;
         this.token = token;
         this.event = event;
         this.users = users;
     }
 
-    private GitProject gitProject;
+    private GitRepository gitRepository;
 
     private String domain;
 
@@ -29,12 +29,12 @@ public class EventInfo<E extends GitUser> {
     private AnActionEvent event;
 
 
-    public GitProject getGitProject() {
-        return gitProject;
+    public GitRepository getGitProject() {
+        return gitRepository;
     }
 
-    public void setGitProject(GitProject gitProject) {
-        this.gitProject = gitProject;
+    public void setGitProject(GitRepository gitRepository) {
+        this.gitRepository = gitRepository;
     }
 
     public String getDomain() {
