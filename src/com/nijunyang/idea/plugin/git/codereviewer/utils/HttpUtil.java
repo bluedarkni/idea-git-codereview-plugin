@@ -18,15 +18,15 @@ public final class HttpUtil {
     }
 
 
-    public static  void postWithHeader(String url, Map<String, String> headers) {
-        HttpRequest.post(url)
+    public static  HttpResponse postWithHeader(String url, Map<String, String> headers) {
+        return HttpRequest.post(url)
                 .headerMap(headers, true)
                 .timeout(5000)
                 .execute();
     }
 
-    public static <T> void postWithHeader(String url, T body, Map<String, String> headers) {
-        HttpRequest.post(url)
+    public static <T> HttpResponse postWithHeader(String url, T body, Map<String, String> headers) {
+        return HttpRequest.post(url)
                 .headerMap(headers, true)
                 .body(JSON.toJSONString(body))
                 .timeout(5000)
