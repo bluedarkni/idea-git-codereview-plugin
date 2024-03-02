@@ -1,10 +1,14 @@
 package com.nijunyang.idea.plugin.git.codereviewer.view;
 
+import cn.hutool.http.HttpResponse;
+import com.alibaba.fastjson.JSON;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.SelectionModel;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.wm.WindowManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
 import com.nijunyang.idea.plugin.git.codereviewer.model.Channel;
@@ -29,8 +33,8 @@ import java.util.Objects;
 public class CodeReviewUI<T extends GitUser> {
 
     private static final String TITLE = "Create Issue";
-    private static final int WIDTH = 550;
-    private static final int HEIGHT = 600;
+
+    private static volatile JDialog DIALOG;
 
     private JPanel mainPanel;
     /**
@@ -50,7 +54,7 @@ public class CodeReviewUI<T extends GitUser> {
      */
     private JComboBox<T> receiverComboBox;
 
-    private JButton commitButton;
+    private JButton confirmButton;
     private JButton cancelButton;
     /**
      * issue 标题
@@ -61,12 +65,36 @@ public class CodeReviewUI<T extends GitUser> {
      */
     private JTextField codeLineRange;
 
-    public static void showIssueDialog(EventInfo eventInfo) {
+    public static void showIssueDialog(EventInfo eventInfo, Project project) {
         AnActionEvent event = eventInfo.getEvent();
         Token token = eventInfo.getToken();
-        JDialog dialog = new JDialog();
+        if (DIALOG == null) {
+            DIALOG = new JDialog();
+        }
+        DIALOG.setVisible(false);
+        // 获取 IDEA 主窗口
+        Frame mainWindow = WindowManager.getInstance().getFrame(project);
+        // 获取 IDEA 主窗口所在屏幕信息
+        GraphicsConfiguration gc = mainWindow.getGraphicsConfiguration();
+        Rectangle bounds = gc.getBounds();
+        // 计算 JDialog 的位置和大小
+        int dialogWidth = bounds.width / 2;
+        int dialogHeight = bounds.height / 2;
+        int dialogX = bounds.x + (bounds.width - dialogWidth) / 2;
+        int dialogY = bounds.y + (bounds.height - dialogHeight) / 2;
+
+        DIALOG.setSize(dialogWidth, dialogHeight);
+        DIALOG.setLocation(dialogX, dialogY);
+
+//        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+//        int width = screenSize.width / 2;
+//        int height = (screenSize.height / 2);
+//        int w = (screenSize.width - width) / 2;
+//        int h = (screenSize.height - height) / 2;
+//        DIALOG.setLocation(w, h);
+//        DIALOG.setSize(width, height);
         try {
-            dialog.setTitle(TITLE);
+            DIALOG.setTitle(TITLE);
             CodeReviewUI<GitUser> codeReviewUI = new CodeReviewUI<>();
 
             //获取当前操作的类文件
@@ -92,7 +120,7 @@ public class CodeReviewUI<T extends GitUser> {
             }
             codeReviewUI.receiverComboBox.setModel(new DefaultComboBoxModel<>(eventInfo.getUsers()));
 
-            codeReviewUI.commitButton.addActionListener(e -> {
+            codeReviewUI.confirmButton.addActionListener(e -> {
                 if (token.getChannel() == Channel.GIT_LAB) {
                     GitUser gitUser = (GitUser) codeReviewUI.receiverComboBox.getSelectedItem();
                     Integer userId = null;
@@ -114,25 +142,20 @@ public class CodeReviewUI<T extends GitUser> {
                     headers.put(GitLabConstant.HEADER_PRIVATE_TOKEN, token.getPrivateKey());
 
                     headers.put("Content-Type", "application/json;charset=UTF-8");
-                    HttpUtil.postWithHeader(issueUrl, gitLabIssueBody, headers);
+                    HttpResponse httpResponse = HttpUtil.postWithHeader(issueUrl, gitLabIssueBody, headers);
                 }
-                dialog.dispose();
+                DIALOG.dispose();
             });
             codeReviewUI.cancelButton.addActionListener(e -> {
-                dialog.dispose();
+                DIALOG.dispose();
             });
 
-            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-            int w = (screenSize.width - WIDTH) / 2;
-            int h = (screenSize.height - HEIGHT) / 2;
-            dialog.setLocation(w, h);
-
-            dialog.setContentPane(codeReviewUI.mainPanel);
-            dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-            dialog.pack();
-            dialog.setVisible(true);
+            DIALOG.setContentPane(codeReviewUI.mainPanel);
+            DIALOG.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+            DIALOG.pack();
+            DIALOG.setVisible(true);
         } catch (Exception e) {
-            dialog.dispose();
+            DIALOG.dispose();
         }
     }
 
