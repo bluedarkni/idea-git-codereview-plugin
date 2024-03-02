@@ -97,12 +97,12 @@
         <border type="none"/>
         <children/>
       </grid>
-      <component id="a0f80" class="javax.swing.JButton" binding="commitButton">
+      <component id="a0f80" class="javax.swing.JButton" binding="confirmButton">
         <constraints>
           <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="commit"/>
+          <text value="confirm"/>
         </properties>
       </component>
       <component id="bec4a" class="javax.swing.JButton" binding="cancelButton" default-binding="true">
