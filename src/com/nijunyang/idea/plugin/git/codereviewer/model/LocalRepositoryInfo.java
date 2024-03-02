@@ -2,14 +2,14 @@ package com.nijunyang.idea.plugin.git.codereviewer.model;
 
 
 /**
- * Description: 项目信息
+ * Description: 代码仓库信息
  * Created by nijunyang on 2022/2/9 9:45
  */
-public class ProjectInfo {
+public class LocalRepositoryInfo {
     /**
-     * 项目地址
+     * 仓库地址
      */
-    private String projectUrl;
+    private String url;
     /**
      * 域名
      */
@@ -17,14 +17,14 @@ public class ProjectInfo {
     /**
      * 项目名字
      */
-    private String projectName;
+    private String name;
 
-    public String getProjectUrl() {
-        return projectUrl;
+    public String getUrl() {
+        return url;
     }
 
-    public void setProjectUrl(String projectUrl) {
-        this.projectUrl = projectUrl;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getDomain() {
@@ -35,11 +35,11 @@ public class ProjectInfo {
         this.domain = domain;
     }
 
-    public String getProjectName() {
-        return projectName;
+    public String getName() {
+        return name;
     }
 
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
+    public void setName(String name) {
+        this.name = name;
     }
 }
