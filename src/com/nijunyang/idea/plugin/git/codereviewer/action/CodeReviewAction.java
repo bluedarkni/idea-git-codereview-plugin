@@ -5,13 +5,9 @@ import com.alibaba.fastjson.TypeReference;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
-import com.nijunyang.idea.plugin.git.codereviewer.model.Channel;
-import com.nijunyang.idea.plugin.git.codereviewer.model.EventInfo;
-import com.nijunyang.idea.plugin.git.codereviewer.model.GitProject;
-import com.nijunyang.idea.plugin.git.codereviewer.model.ProjectInfo;
-import com.nijunyang.idea.plugin.git.codereviewer.model.Token;
+import com.nijunyang.idea.plugin.git.codereviewer.model.*;
 import com.nijunyang.idea.plugin.git.codereviewer.model.gitlab.GitLabConstant;
-import com.nijunyang.idea.plugin.git.codereviewer.model.gitlab.GitLabProject;
+import com.nijunyang.idea.plugin.git.codereviewer.model.gitlab.GitLabRepository;
 import com.nijunyang.idea.plugin.git.codereviewer.model.gitlab.GitLabUser;
 import com.nijunyang.idea.plugin.git.codereviewer.utils.HttpUtil;
 import com.nijunyang.idea.plugin.git.codereviewer.utils.PathUtil;
@@ -22,11 +18,7 @@ import com.nijunyang.idea.plugin.git.codereviewer.view.TokenConfigUI;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Vector;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -39,7 +31,7 @@ public class CodeReviewAction extends AnAction {
 
     public static Map<String, Token> tokenMap = new ConcurrentHashMap<>(1);
 
-    public static Map<String, ProjectInfo> projectInfoMap = new ConcurrentHashMap<>(1);
+    public static Map<String, LocalRepositoryInfo> projectInfoMap = new ConcurrentHashMap<>(1);
 
     /**
      * 1.从.git/config获取项目地址
@@ -52,16 +44,15 @@ public class CodeReviewAction extends AnAction {
     public void actionPerformed(@NotNull AnActionEvent event) {
         Project ideaProject = event.getProject();
         String localId = ideaProject.getLocationHash();
-        ProjectInfo projectInfo = projectInfoMap.get(localId);
-        if (projectInfo == null) {
+        LocalRepositoryInfo localRepositoryInfo = projectInfoMap.get(localId);
+        if (localRepositoryInfo == null) {
             String projectUrl = PathUtil.loadProjectUrl(Objects.requireNonNull(ideaProject));
             String domain = UrlUtil.parseDomainName(projectUrl);
-            String projectName = UrlUtil.parseProjectName(projectUrl);
-            projectInfo = new ProjectInfo();
-            projectInfo.setProjectUrl(projectUrl);
-            projectInfo.setDomain(domain);
-            projectInfo.setProjectName(projectName);
-            projectInfoMap.put(localId, projectInfo);
+            localRepositoryInfo = new LocalRepositoryInfo();
+            localRepositoryInfo.setUrl(projectUrl);
+            localRepositoryInfo.setDomain(domain);
+            localRepositoryInfo.setName(ideaProject.getName());
+            projectInfoMap.put(localId, localRepositoryInfo);
         }
         Token token = tokenMap.get(localId);
         if (token == null) {
@@ -70,39 +61,46 @@ public class CodeReviewAction extends AnAction {
                 TokenConfigUI.setToken(ideaProject);
             } else {
                 tokenMap.put(localId, token);
-                showIssueDialog(event, projectInfo.getDomain(), projectInfo.getProjectName(), token);
+                showIssueDialog(event, localRepositoryInfo, token);
             }
         } else {
-            showIssueDialog(event, projectInfo.getDomain(), projectInfo.getProjectName(), token);
+            showIssueDialog(event, localRepositoryInfo, token);
         }
     }
 
-    private void showIssueDialog(@NotNull AnActionEvent event, String domain, String projectName, Token token) {
-        //获取项目信息
-        GitProject gitProject = null;
+    private void showIssueDialog(@NotNull AnActionEvent event, LocalRepositoryInfo localRepositoryInfo, Token token) {
+        String domain = localRepositoryInfo.getDomain();
+        String projectName = localRepositoryInfo.getName();
+        String url = localRepositoryInfo.getUrl();
+
+        //获取仓库信息
+        GitRepository gitRepository = null;
         if (token.getChannel() == Channel.GIT_LAB) {
             String projectInfoUrl = "https://" + domain +
                     MessageFormat.format(GitLabConstant.PROJECT_INFO_URL, projectName);
             Map<String, String> headers = new HashMap<>();
             headers.put(GitLabConstant.HEADER_PRIVATE_TOKEN, token.getPrivateKey());
             String gitProjectStr = HttpUtil.getWithHeader(projectInfoUrl, headers);
-            List<GitLabProject> projectList = JSON.parseObject(gitProjectStr, new TypeReference<List<GitLabProject>>() {
+            List<GitLabRepository> projectList = JSON.parseObject(gitProjectStr, new TypeReference<List<GitLabRepository>>() {
             });
-            gitProject = projectList.get(0);
+            Optional<GitLabRepository> projectOptional = projectList.stream().filter(e -> e.getHttp_url_to_repo().equals(url))
+                    .findFirst();
+            if (projectOptional.isPresent()) {
+                gitRepository = projectOptional.get();
+            }
         }
-        assert gitProject != null;
+        assert gitRepository != null;
         //获取该项目用户信息
-        Vector<?> users = new Vector<>();
+        Vector<? extends GitUser> users = new Vector<>();
         if (token.getChannel() == Channel.GIT_LAB) {
             String usersUrl = "https://" + domain +
-                    MessageFormat.format(GitLabConstant.PROJECT_USERS_URL, gitProject.getId());
+                    MessageFormat.format(GitLabConstant.PROJECT_USERS_URL, gitRepository.getId());
             Map<String, String> headers = new HashMap<>();
             headers.put(GitLabConstant.HEADER_PRIVATE_TOKEN, token.getPrivateKey());
             String responseStr = HttpUtil.getWithHeader(usersUrl, headers);
             users = JSON.parseObject(responseStr, new TypeReference<Vector<GitLabUser>>() {});
-
         }
-        CodeReviewUI.showIssueDialog(new EventInfo(gitProject, domain, token, event, users));
+        CodeReviewUI.showIssueDialog(new EventInfo(gitRepository, domain, token, event, users), event.getProject());
     }
 
 }
