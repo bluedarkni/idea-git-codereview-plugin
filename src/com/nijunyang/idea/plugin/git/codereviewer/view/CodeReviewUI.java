@@ -1,6 +1,5 @@
 package com.nijunyang.idea.plugin.git.codereviewer.view;
 
-import cn.hutool.http.ContentType;
 import cn.hutool.http.HttpResponse;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -176,7 +175,7 @@ public class CodeReviewUI<T extends GitUser> {
         GiteeRepository giteeRepository = (GiteeRepository) gitRepository;
         LocalRepositoryInfo localRepositoryInfo = eventInfo.getLocalRepositoryInfo();
         String issueUrl = HttpUtil.HTTPS_PROTOCOL + eventInfo.getDomain()
-                + MessageFormat.format(GiteeConstant.ISSUE_URL, localRepositoryInfo.getOwner());
+                + MessageFormat.format(GiteeConstant.ISSUE_URL, localRepositoryInfo.getGroupPath());
         GiteeIssueBody giteeIssueBody = new GiteeIssueBody();
         giteeIssueBody.setAccess_token(token.getPrivateKey());
         giteeIssueBody.setTitle(title);
