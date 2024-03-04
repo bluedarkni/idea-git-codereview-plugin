@@ -6,6 +6,9 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.nijunyang.idea.plugin.git.codereviewer.model.*;
+import com.nijunyang.idea.plugin.git.codereviewer.model.gitee.Collaborator;
+import com.nijunyang.idea.plugin.git.codereviewer.model.gitee.GiteeConstant;
+import com.nijunyang.idea.plugin.git.codereviewer.model.gitee.GiteeRepository;
 import com.nijunyang.idea.plugin.git.codereviewer.model.gitlab.GitLabConstant;
 import com.nijunyang.idea.plugin.git.codereviewer.model.gitlab.GitLabRepository;
 import com.nijunyang.idea.plugin.git.codereviewer.model.gitlab.GitLabUser;
@@ -52,6 +55,9 @@ public class CodeReviewAction extends AnAction {
             localRepositoryInfo.setUrl(projectUrl);
             localRepositoryInfo.setDomain(domain);
             localRepositoryInfo.setName(ideaProject.getName());
+            String[] parts = projectUrl.split("/");
+            String owner = parts[3];
+            localRepositoryInfo.setOwner(owner);
             projectInfoMap.put(localId, localRepositoryInfo);
         }
         Token token = tokenMap.get(localId);
@@ -70,17 +76,18 @@ public class CodeReviewAction extends AnAction {
 
     private void showIssueDialog(@NotNull AnActionEvent event, LocalRepositoryInfo localRepositoryInfo, Token token) {
         String domain = localRepositoryInfo.getDomain();
-        String projectName = localRepositoryInfo.getName();
+        String repositoryName = localRepositoryInfo.getName();
         String url = localRepositoryInfo.getUrl();
+
 
         //获取仓库信息
         GitRepository gitRepository = null;
         if (token.getChannel() == Channel.GIT_LAB) {
-            String projectInfoUrl = "https://" + domain +
-                    MessageFormat.format(GitLabConstant.PROJECT_INFO_URL, projectName);
+            String repositoryInfoUrl = HttpUtil.HTTPS_PROTOCOL + domain +
+                    MessageFormat.format(GitLabConstant.PROJECT_INFO_URL, repositoryName);
             Map<String, String> headers = new HashMap<>();
             headers.put(GitLabConstant.HEADER_PRIVATE_TOKEN, token.getPrivateKey());
-            String gitProjectStr = HttpUtil.getWithHeader(projectInfoUrl, headers);
+            String gitProjectStr = HttpUtil.getWithHeader(repositoryInfoUrl, headers);
             List<GitLabRepository> projectList = JSON.parseObject(gitProjectStr, new TypeReference<List<GitLabRepository>>() {
             });
             Optional<GitLabRepository> projectOptional = projectList.stream().filter(e -> e.getHttp_url_to_repo().equals(url))
@@ -88,19 +95,35 @@ public class CodeReviewAction extends AnAction {
             if (projectOptional.isPresent()) {
                 gitRepository = projectOptional.get();
             }
+        } else if (token.getChannel() == Channel.GIT_EE) {
+            String owner = localRepositoryInfo.getOwner();
+            String repositoryInfoUrl = HttpUtil.HTTPS_PROTOCOL + domain +
+                    MessageFormat.format(GiteeConstant.OWNER_REPO_URL, owner, repositoryName, token.getPrivateKey());
+            GiteeRepository giteeRepository = HttpUtil.getWithNoHeader(repositoryInfoUrl, GiteeRepository.class);
+            gitRepository = giteeRepository;
+        } else if (token.getChannel() == Channel.GIT_HUB) {
+            //todo
         }
         assert gitRepository != null;
-        //获取该项目用户信息
+        //获取该仓库用户信息
         Vector<? extends GitUser> users = new Vector<>();
         if (token.getChannel() == Channel.GIT_LAB) {
-            String usersUrl = "https://" + domain +
+            String usersUrl = HttpUtil.HTTPS_PROTOCOL + domain +
                     MessageFormat.format(GitLabConstant.PROJECT_USERS_URL, gitRepository.getId());
             Map<String, String> headers = new HashMap<>();
             headers.put(GitLabConstant.HEADER_PRIVATE_TOKEN, token.getPrivateKey());
             String responseStr = HttpUtil.getWithHeader(usersUrl, headers);
             users = JSON.parseObject(responseStr, new TypeReference<Vector<GitLabUser>>() {});
+        } else if (token.getChannel() == Channel.GIT_EE) {
+            String owner = localRepositoryInfo.getOwner();
+            String usersUrl = HttpUtil.HTTPS_PROTOCOL + domain +
+                    MessageFormat.format(GiteeConstant.COLLABORATORS_URL, owner, repositoryName, token.getPrivateKey());
+            String responseStr = HttpUtil.getWithNoHeader(usersUrl);
+            users = JSON.parseObject(responseStr, new TypeReference<Vector<Collaborator>>() {});
+        } else if (token.getChannel() == Channel.GIT_HUB) {
+            //todo
         }
-        CodeReviewUI.showIssueDialog(new EventInfo(gitRepository, domain, token, event, users), event.getProject());
+        CodeReviewUI.showIssueDialog(new EventInfo(gitRepository, localRepositoryInfo, token, event, users), event.getProject());
     }
 
 }
