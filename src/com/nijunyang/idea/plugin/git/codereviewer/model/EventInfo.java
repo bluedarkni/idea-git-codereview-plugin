@@ -10,9 +10,9 @@ import java.util.Vector;
  */
 public class EventInfo<E extends GitUser> {
 
-    public EventInfo(GitRepository gitRepository, String domain, Token token, AnActionEvent event, Vector<E> users) {
+    public EventInfo(GitRepository gitRepository, LocalRepositoryInfo localRepositoryInfo, Token token, AnActionEvent event, Vector<E> users) {
         this.gitRepository = gitRepository;
-        this.domain = domain;
+        this.localRepositoryInfo = localRepositoryInfo;
         this.token = token;
         this.event = event;
         this.users = users;
@@ -20,7 +20,9 @@ public class EventInfo<E extends GitUser> {
 
     private GitRepository gitRepository;
 
-    private String domain;
+//    private String domain;
+
+    private LocalRepositoryInfo localRepositoryInfo;
 
     private Token token;
 
@@ -29,20 +31,24 @@ public class EventInfo<E extends GitUser> {
     private AnActionEvent event;
 
 
-    public GitRepository getGitProject() {
+    public GitRepository getGitRepository() {
         return gitRepository;
     }
 
-    public void setGitProject(GitRepository gitRepository) {
+    public void setGitRepository(GitRepository gitRepository) {
         this.gitRepository = gitRepository;
     }
 
-    public String getDomain() {
-        return domain;
+    public LocalRepositoryInfo getLocalRepositoryInfo() {
+        return localRepositoryInfo;
     }
 
-    public void setDomain(String domain) {
-        this.domain = domain;
+    public void setLocalRepositoryInfo(LocalRepositoryInfo localRepositoryInfo) {
+        this.localRepositoryInfo = localRepositoryInfo;
+    }
+
+    public String getDomain() {
+        return localRepositoryInfo.getDomain();
     }
 
     public Token getToken() {
