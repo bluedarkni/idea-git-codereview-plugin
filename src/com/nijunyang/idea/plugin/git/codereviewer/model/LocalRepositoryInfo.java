@@ -15,11 +15,14 @@ public class LocalRepositoryInfo {
      */
     private String domain;
     /**
-     * 项目名字
+     * 仓库名字
      */
     private String name;
 
-    private String owner;
+    /**
+     * 仓库分组路径
+     */
+    private String groupPath;
 
     public String getUrl() {
         return url;
@@ -45,11 +48,11 @@ public class LocalRepositoryInfo {
         this.name = name;
     }
 
-    public String getOwner() {
-        return owner;
+    public String getGroupPath() {
+        return groupPath;
     }
 
-    public void setOwner(String owner) {
-        this.owner = owner;
+    public void setGroupPath(String groupPath) {
+        this.groupPath = groupPath;
     }
 }
