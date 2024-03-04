@@ -49,15 +49,7 @@ public class CodeReviewAction extends AnAction {
         String localId = ideaProject.getLocationHash();
         LocalRepositoryInfo localRepositoryInfo = projectInfoMap.get(localId);
         if (localRepositoryInfo == null) {
-            String projectUrl = PathUtil.loadProjectUrl(Objects.requireNonNull(ideaProject));
-            String domain = UrlUtil.parseDomainName(projectUrl);
-            localRepositoryInfo = new LocalRepositoryInfo();
-            localRepositoryInfo.setUrl(projectUrl);
-            localRepositoryInfo.setDomain(domain);
-            localRepositoryInfo.setName(ideaProject.getName());
-            String[] parts = projectUrl.split("/");
-            String owner = parts[3];
-            localRepositoryInfo.setOwner(owner);
+            localRepositoryInfo = PathUtil.localRepositoryInfo(Objects.requireNonNull(ideaProject));
             projectInfoMap.put(localId, localRepositoryInfo);
         }
         Token token = tokenMap.get(localId);
@@ -90,13 +82,14 @@ public class CodeReviewAction extends AnAction {
             String gitProjectStr = HttpUtil.getWithHeader(repositoryInfoUrl, headers);
             List<GitLabRepository> projectList = JSON.parseObject(gitProjectStr, new TypeReference<List<GitLabRepository>>() {
             });
-            Optional<GitLabRepository> projectOptional = projectList.stream().filter(e -> e.getHttp_url_to_repo().equals(url))
+            Optional<GitLabRepository> projectOptional = projectList.stream()
+                    .filter(e -> e.getHttp_url_to_repo().equals(url) || e.getSsh_url_to_repo().equals(url))
                     .findFirst();
             if (projectOptional.isPresent()) {
                 gitRepository = projectOptional.get();
             }
         } else if (token.getChannel() == Channel.GIT_EE) {
-            String owner = localRepositoryInfo.getOwner();
+            String owner = localRepositoryInfo.getGroupPath();
             String repositoryInfoUrl = HttpUtil.HTTPS_PROTOCOL + domain +
                     MessageFormat.format(GiteeConstant.OWNER_REPO_URL, owner, repositoryName, token.getPrivateKey());
             GiteeRepository giteeRepository = HttpUtil.getWithNoHeader(repositoryInfoUrl, GiteeRepository.class);
@@ -115,7 +108,7 @@ public class CodeReviewAction extends AnAction {
             String responseStr = HttpUtil.getWithHeader(usersUrl, headers);
             users = JSON.parseObject(responseStr, new TypeReference<Vector<GitLabUser>>() {});
         } else if (token.getChannel() == Channel.GIT_EE) {
-            String owner = localRepositoryInfo.getOwner();
+            String owner = localRepositoryInfo.getGroupPath();
             String usersUrl = HttpUtil.HTTPS_PROTOCOL + domain +
                     MessageFormat.format(GiteeConstant.COLLABORATORS_URL, owner, repositoryName, token.getPrivateKey());
             String responseStr = HttpUtil.getWithNoHeader(usersUrl);
