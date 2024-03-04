@@ -19,6 +19,8 @@ public class LocalRepositoryInfo {
      */
     private String name;
 
+    private String owner;
+
     public String getUrl() {
         return url;
     }
@@ -41,5 +43,13 @@ public class LocalRepositoryInfo {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 }
