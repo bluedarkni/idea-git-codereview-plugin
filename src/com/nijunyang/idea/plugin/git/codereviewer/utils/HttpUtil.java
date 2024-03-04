@@ -14,6 +14,9 @@ import java.util.Map;
  */
 public final class HttpUtil {
 
+
+    public static final String HTTPS_PROTOCOL = "https://";
+
     private HttpUtil() {
     }
 
@@ -31,6 +34,33 @@ public final class HttpUtil {
                 .body(JSON.toJSONString(body))
                 .timeout(5000)
                 .execute();
+    }
+
+    public static <T> HttpResponse postWithNoHeader(String url, T body) {
+        return HttpRequest.post(url)
+                .body(JSON.toJSONString(body))
+                .timeout(5000)
+                .execute();
+    }
+
+    public static <T> T getWithNoHeader(String url, Class<T> tClass) {
+        HttpResponse httpResponse = HttpRequest.get(url)
+                .timeout(5000)
+                .execute();
+        if (httpResponse.getStatus() < HttpStatus.HTTP_MULT_CHOICE) {
+            return JSON.parseObject(httpResponse.body(), tClass);
+        }
+        throw new RuntimeException(httpResponse.getStatus() + httpResponse.body());
+    }
+
+    public static String getWithNoHeader(String url) {
+        HttpResponse httpResponse = HttpRequest.get(url)
+                .timeout(5000)
+                .execute();
+        if (httpResponse.getStatus() < HttpStatus.HTTP_MULT_CHOICE) {
+            return httpResponse.body();
+        }
+        throw new RuntimeException(httpResponse.getStatus() + httpResponse.body());
     }
 
     public static <T> T getWithHeader(String url, Map<String, String> headers, Class<T> tClass) {
