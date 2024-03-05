@@ -4,6 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import com.intellij.openapi.project.Project;
 import com.nijunyang.idea.plugin.git.codereviewer.model.LocalRepositoryInfo;
 
+import javax.swing.*;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -39,7 +40,7 @@ public final class PathUtil {
                     String domain = UrlUtil.parseDomainName(url);
                     localRepositoryInfo.setDomain(domain);
 
-                    String[] split1 = url.split("domain");
+                    String[] split1 = url.split(domain);
                     int lastIndex = split1[1].lastIndexOf("/");
                     localRepositoryInfo.setGroupPath(split1[1].substring(1, lastIndex));
                 } else if (url.startsWith("git@")) {
@@ -52,7 +53,9 @@ public final class PathUtil {
                 return localRepositoryInfo;
             }
         }
-
+        JOptionPane.showMessageDialog(null,
+                "not find git config",
+                "警告", JOptionPane.WARNING_MESSAGE);
         throw new RuntimeException("not find git config");
     }
 
