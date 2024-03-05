@@ -128,7 +128,6 @@ public class CodeReviewAction extends AnAction {
             headers.put(GitHubConstant.AUTHORIZATION, GitHubConstant.BEARER + token.getPrivateKey());
             String responseStr = HttpUtil.getWithHeader(usersUrl, headers);
             users = JSON.parseObject(responseStr, new TypeReference<Vector<GitHubCollaborator>>() {});
-            System.out.println(users);
         }
         CodeReviewUI.showIssueDialog(new EventInfo(gitRepository, localRepositoryInfo, token, event, users), event.getProject());
     }
