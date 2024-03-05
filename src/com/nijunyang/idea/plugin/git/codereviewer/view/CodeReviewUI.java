@@ -15,13 +15,18 @@ import com.nijunyang.idea.plugin.git.codereviewer.model.gitee.Collaborator;
 import com.nijunyang.idea.plugin.git.codereviewer.model.gitee.GiteeConstant;
 import com.nijunyang.idea.plugin.git.codereviewer.model.gitee.GiteeIssueBody;
 import com.nijunyang.idea.plugin.git.codereviewer.model.gitee.GiteeRepository;
+import com.nijunyang.idea.plugin.git.codereviewer.model.github.GitHubCollaborator;
+import com.nijunyang.idea.plugin.git.codereviewer.model.github.GitHubConstant;
+import com.nijunyang.idea.plugin.git.codereviewer.model.github.GitHubIssueBody;
 import com.nijunyang.idea.plugin.git.codereviewer.model.gitlab.GitLabConstant;
 import com.nijunyang.idea.plugin.git.codereviewer.model.gitlab.GitLabIssueBody;
 import com.nijunyang.idea.plugin.git.codereviewer.utils.HttpUtil;
+import org.apache.commons.lang.StringUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -132,6 +137,8 @@ public class CodeReviewUI<T extends GitUser> {
                     gitLabIssue(eventInfo, token, gitRepository, codeReviewUI.issueTitleTextField.getText(), receiver, description);
                 } else if (token.getChannel() == Channel.GIT_EE) {
                     giteeIssue(eventInfo, token, gitRepository, codeReviewUI.issueTitleTextField.getText(), receiver, description);
+                } else if (token.getChannel() == Channel.GIT_HUB) {
+                    githubIssue(eventInfo, token, codeReviewUI.issueTitleTextField.getText(), receiver, description);
                 }
                 DIALOG.dispose();
             });
@@ -146,6 +153,32 @@ public class CodeReviewUI<T extends GitUser> {
         } catch (Exception e) {
             DIALOG.dispose();
         }
+    }
+
+    private static void githubIssue(EventInfo<? extends GitUser> eventInfo,
+                                    Token token, String title,
+                                    GitUser receiver, String description) {
+
+        GitHubCollaborator gitHubCollaborator = (GitHubCollaborator) receiver;
+        GitHubIssueBody gitHubIssueBody = new GitHubIssueBody();
+        gitHubIssueBody.setTitle(title);
+        gitHubIssueBody.setBody(description);
+        gitHubIssueBody.setAssignees(Arrays.asList(gitHubCollaborator.getLogin()));
+//        gitHubIssueBody.setLabels(Arrays.asList("BUG"));
+        String domain = eventInfo.getDomain();
+        String apiDomain = token.getApiDomain();
+        if (!StringUtils.isEmpty(apiDomain)) {
+            domain = apiDomain;
+        }
+        LocalRepositoryInfo localRepositoryInfo = eventInfo.getLocalRepositoryInfo();
+        String issueUrl = HttpUtil.HTTPS_PROTOCOL + domain
+                + MessageFormat.format(GitHubConstant.ISSUE_URL, localRepositoryInfo.getGroupPath(), localRepositoryInfo.getName());
+        Map<String, String> headers = new HashMap<>();
+        headers.put(GitHubConstant.AUTHORIZATION, GitHubConstant.BEARER + token.getPrivateKey());
+//        headers.put("Content-Type", "application/json;charset=UTF-8");
+//        headers.put("Content-Type", "application/vnd.github+json");
+        HttpResponse httpResponse = HttpUtil.postWithHeader(issueUrl, gitHubIssueBody, headers);
+        checkResponse(httpResponse, issueUrl);
     }
 
     private static void gitLabIssue(EventInfo<? extends GitUser> eventInfo, Token token,
@@ -166,7 +199,7 @@ public class CodeReviewUI<T extends GitUser> {
 
         headers.put("Content-Type", "application/json;charset=UTF-8");
         HttpResponse httpResponse = HttpUtil.postWithHeader(issueUrl, gitLabIssueBody, headers);
-        checkResponse(httpResponse);
+        checkResponse(httpResponse, issueUrl);
     }
 
     private static void giteeIssue(EventInfo<? extends GitUser> eventInfo, Token token, GitRepository gitRepository,
@@ -183,12 +216,16 @@ public class CodeReviewUI<T extends GitUser> {
         giteeIssueBody.setAssignee(collaborator.getLogin());
         giteeIssueBody.setRepo(giteeRepository.getPath());
         HttpResponse httpResponse = HttpUtil.postWithNoHeader(issueUrl, giteeIssueBody);
-        checkResponse(httpResponse);
+        checkResponse(httpResponse, issueUrl);
     }
 
-    private static void checkResponse(HttpResponse httpResponse) {
-        if (httpResponse.getStatus() >= 200) {
-            JOptionPane.showMessageDialog(null, httpResponse.body(), "警告", JOptionPane.WARNING_MESSAGE);
+    private static void checkResponse(HttpResponse httpResponse, String url) {
+        if (httpResponse.getStatus() >= 300) {
+            JOptionPane.showMessageDialog(null,
+                    "异常码：" + httpResponse.getStatus()
+                            + System.lineSeparator() + url
+                            + System.lineSeparator() + "message:" + httpResponse.body(),
+                    "警告", JOptionPane.WARNING_MESSAGE);
         }
     }
 
