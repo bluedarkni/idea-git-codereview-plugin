@@ -7,14 +7,14 @@
   <description><![CDATA[
     代码检视工具。<br>
       主要功能：<br>
-          1、 可以直接将代码检视中的问题提交到代码仓库中，目前支持gitLab<br>
+          1、 可以直接将代码检视中的问题或者意见，以issue的方式提交到代码仓库中进行跟踪修改，支持github、gitLab、gitee<br>
     ]]></description>
 
   <change-notes>
     <![CDATA[
           代码检视工具。<br>
       主要功能：<br>
-          1、 可以直接将代码检视中的问题提交到代码仓库中，目前支持gitLab<br>
+          1、 可以直接将代码检视中的问题或者意见，以issue的方式提交到代码仓库中进行跟踪修改，支持github、gitLab、gitee<br>
     ]]>
   </change-notes>
 
