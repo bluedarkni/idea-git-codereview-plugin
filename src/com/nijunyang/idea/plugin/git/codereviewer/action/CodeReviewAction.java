@@ -9,15 +9,18 @@ import com.nijunyang.idea.plugin.git.codereviewer.model.*;
 import com.nijunyang.idea.plugin.git.codereviewer.model.gitee.Collaborator;
 import com.nijunyang.idea.plugin.git.codereviewer.model.gitee.GiteeConstant;
 import com.nijunyang.idea.plugin.git.codereviewer.model.gitee.GiteeRepository;
+import com.nijunyang.idea.plugin.git.codereviewer.model.github.GitHubCollaborator;
+import com.nijunyang.idea.plugin.git.codereviewer.model.github.GitHubConstant;
+import com.nijunyang.idea.plugin.git.codereviewer.model.github.GitHubRepository;
 import com.nijunyang.idea.plugin.git.codereviewer.model.gitlab.GitLabConstant;
 import com.nijunyang.idea.plugin.git.codereviewer.model.gitlab.GitLabRepository;
 import com.nijunyang.idea.plugin.git.codereviewer.model.gitlab.GitLabUser;
 import com.nijunyang.idea.plugin.git.codereviewer.utils.HttpUtil;
 import com.nijunyang.idea.plugin.git.codereviewer.utils.PathUtil;
 import com.nijunyang.idea.plugin.git.codereviewer.utils.TokenUtil;
-import com.nijunyang.idea.plugin.git.codereviewer.utils.UrlUtil;
 import com.nijunyang.idea.plugin.git.codereviewer.view.CodeReviewUI;
 import com.nijunyang.idea.plugin.git.codereviewer.view.TokenConfigUI;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.MessageFormat;
@@ -95,7 +98,7 @@ public class CodeReviewAction extends AnAction {
             GiteeRepository giteeRepository = HttpUtil.getWithNoHeader(repositoryInfoUrl, GiteeRepository.class);
             gitRepository = giteeRepository;
         } else if (token.getChannel() == Channel.GIT_HUB) {
-            //todo
+            gitRepository = new GitHubRepository();
         }
         assert gitRepository != null;
         //获取该仓库用户信息
@@ -114,7 +117,18 @@ public class CodeReviewAction extends AnAction {
             String responseStr = HttpUtil.getWithNoHeader(usersUrl);
             users = JSON.parseObject(responseStr, new TypeReference<Vector<Collaborator>>() {});
         } else if (token.getChannel() == Channel.GIT_HUB) {
-            //todo
+            String owner = localRepositoryInfo.getGroupPath();
+            String apiDomain = token.getApiDomain();
+            if (!StringUtils.isEmpty(apiDomain)) {
+                domain = apiDomain;
+            }
+            String usersUrl = HttpUtil.HTTPS_PROTOCOL + domain +
+                    MessageFormat.format(GitHubConstant.COLLABORATORS_URL, owner, repositoryName);
+            Map<String, String> headers = new HashMap<>();
+            headers.put(GitHubConstant.AUTHORIZATION, GitHubConstant.BEARER + token.getPrivateKey());
+            String responseStr = HttpUtil.getWithHeader(usersUrl, headers);
+            users = JSON.parseObject(responseStr, new TypeReference<Vector<GitHubCollaborator>>() {});
+            System.out.println(users);
         }
         CodeReviewUI.showIssueDialog(new EventInfo(gitRepository, localRepositoryInfo, token, event, users), event.getProject());
     }
