@@ -4,7 +4,7 @@ import com.nijunyang.idea.plugin.git.codereviewer.model.GitRepository;
 
 /**
  * Description:
- * Created by GW00295392 on 2024/3/4
+ * Created by nijunyang on 2024/3/4
  */
 public class GiteeRepository extends GitRepository {
 

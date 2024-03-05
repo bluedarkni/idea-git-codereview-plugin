@@ -4,7 +4,7 @@ import com.nijunyang.idea.plugin.git.codereviewer.model.GitUser;
 
 /**
  * Description: 仓库协作用户
- * Created by GW00295392 on 2024/3/4
+ * Created by nijunyang on 2024/3/4
  */
 public class Collaborator extends GitUser {
 
