@@ -5,6 +5,7 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpStatus;
 import com.alibaba.fastjson.JSON;
 
+import javax.swing.*;
 import java.util.Map;
 
 
@@ -49,6 +50,11 @@ public final class HttpUtil {
                 .execute();
         if (httpResponse.getStatus() < HttpStatus.HTTP_MULT_CHOICE) {
             return JSON.parseObject(httpResponse.body(), tClass);
+        } else {
+            JOptionPane.showMessageDialog(null,
+                    "异常码：" + httpResponse.getStatus()
+                            + System.lineSeparator() + url,
+                    "警告", JOptionPane.WARNING_MESSAGE);
         }
         throw new RuntimeException(httpResponse.getStatus() + httpResponse.body());
     }
@@ -59,6 +65,11 @@ public final class HttpUtil {
                 .execute();
         if (httpResponse.getStatus() < HttpStatus.HTTP_MULT_CHOICE) {
             return httpResponse.body();
+        } else {
+            JOptionPane.showMessageDialog(null,
+                    "异常码：" + httpResponse.getStatus()
+                            + System.lineSeparator() + url,
+                    "警告", JOptionPane.WARNING_MESSAGE);
         }
         throw new RuntimeException(httpResponse.getStatus() + httpResponse.body());
     }
@@ -70,6 +81,11 @@ public final class HttpUtil {
                 .execute();
         if (httpResponse.getStatus() < HttpStatus.HTTP_MULT_CHOICE) {
             return JSON.parseObject(httpResponse.body(), tClass);
+        }else {
+            JOptionPane.showMessageDialog(null,
+                    "异常码：" + httpResponse.getStatus()
+                            + System.lineSeparator() + url,
+                    "警告", JOptionPane.WARNING_MESSAGE);
         }
         throw new RuntimeException(httpResponse.getStatus() + httpResponse.body());
     }
@@ -81,6 +97,11 @@ public final class HttpUtil {
                 .execute();
         if (httpResponse.getStatus() < HttpStatus.HTTP_MULT_CHOICE) {
             return httpResponse.body();
+        } else {
+            JOptionPane.showMessageDialog(null,
+                    "异常码：" + httpResponse.getStatus()
+                    + System.lineSeparator() + url,
+                    "警告", JOptionPane.WARNING_MESSAGE);
         }
         throw new RuntimeException(httpResponse.getStatus() + httpResponse.body());
     }
