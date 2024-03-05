@@ -27,6 +27,7 @@ public class TokenConfigUI {
     private JRadioButton gitLab;
     private JRadioButton gitee;
     private JTextField accessToken;
+    private JTextField apiDomain;
     private JButton confirmButton;
     private JButton cancelButton;
 
@@ -48,6 +49,10 @@ public class TokenConfigUI {
                 String key = tokenConfigUI.accessToken.getText();
                 Token token = new Token();
                 token.setPrivateKey(key);
+                String apiDomainText = tokenConfigUI.apiDomain.getText();
+                if (apiDomainText != null && !apiDomainText.isEmpty()) {
+                    token.setApiDomain(apiDomainText);
+                }
                 String choice  = getSelected(buttonGroup);
                 if (Objects.nonNull(choice) && Objects.nonNull(key)) {
                     Channel channel = Channel.getByAliasName(choice);
