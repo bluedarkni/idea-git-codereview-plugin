@@ -56,17 +56,6 @@ public final class PathUtil {
         throw new RuntimeException("not find git config");
     }
 
-    public static void main(String[] args) {
-        String url = "https://gitlab.btpoc.com/platform/commercialize-loop/rights-package/bt-rightspackage-service.git";
-        String[] split1 = url.split("gitlab.btpoc.com");
-        System.out.println(split1[1]);
-
-        int lastIndex = split1[1].lastIndexOf("/");
-        String result = split1[1].substring(1, lastIndex);
-        System.out.println(result);
-
-    }
-
     public static String combinePath(String...args){
         if (args == null || args.length == 0) {
             throw new IllegalArgumentException("path is empty.");
