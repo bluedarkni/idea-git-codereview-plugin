@@ -178,7 +178,7 @@ public class CodeReviewUI<T extends GitUser> {
 //        headers.put("Content-Type", "application/json;charset=UTF-8");
 //        headers.put("Content-Type", "application/vnd.github+json");
         HttpResponse httpResponse = HttpUtil.postWithHeader(issueUrl, gitHubIssueBody, headers);
-        checkResponse(httpResponse, issueUrl);
+        checkResponse(httpResponse, issueUrl, eventInfo.getEvent().getProject());
     }
 
     private static void gitLabIssue(EventInfo<? extends GitUser> eventInfo, Token token,
@@ -199,7 +199,7 @@ public class CodeReviewUI<T extends GitUser> {
 
         headers.put("Content-Type", "application/json;charset=UTF-8");
         HttpResponse httpResponse = HttpUtil.postWithHeader(issueUrl, gitLabIssueBody, headers);
-        checkResponse(httpResponse, issueUrl);
+        checkResponse(httpResponse, issueUrl, eventInfo.getEvent().getProject());
     }
 
     private static void giteeIssue(EventInfo<? extends GitUser> eventInfo, Token token, GitRepository gitRepository,
@@ -216,16 +216,21 @@ public class CodeReviewUI<T extends GitUser> {
         giteeIssueBody.setAssignee(collaborator.getLogin());
         giteeIssueBody.setRepo(giteeRepository.getPath());
         HttpResponse httpResponse = HttpUtil.postWithNoHeader(issueUrl, giteeIssueBody);
-        checkResponse(httpResponse, issueUrl);
+        checkResponse(httpResponse, issueUrl, eventInfo.getEvent().getProject());
     }
 
-    private static void checkResponse(HttpResponse httpResponse, String url) {
+    private static void checkResponse(HttpResponse httpResponse, String url, Project project) {
+        Frame mainWindow = WindowManager.getInstance().getFrame(project);
         if (httpResponse.getStatus() >= 300) {
-            JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(mainWindow,
                     "异常码：" + httpResponse.getStatus()
                             + System.lineSeparator() + url
                             + System.lineSeparator() + "message:" + httpResponse.body(),
                     "警告", JOptionPane.WARNING_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(mainWindow,
+                    "Successfully",
+                    "issue", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
