@@ -11,6 +11,11 @@ public class Token {
 
     private String privateKey;
 
+    /**
+     * api域名
+     */
+    private String apiDomain;
+
     public Channel getChannel() {
         return channel;
     }
@@ -25,5 +30,13 @@ public class Token {
 
     public void setPrivateKey(String privateKey) {
         this.privateKey = privateKey;
+    }
+
+    public String getApiDomain() {
+        return apiDomain;
+    }
+
+    public void setApiDomain(String apiDomain) {
+        this.apiDomain = apiDomain;
     }
 }
