@@ -20,4 +20,5 @@ idea代码检视插件
 4.web页面追踪issue信息
 <img src="https://gitee.com/bluedarkni/images/raw/master/codereview-guide/issue3.png"/>    
 
-
+5.github,gitlab 操作同上，申请对应的token即可，api domain 选填，如果仓库api的域名和仓库域名不一样就需要填写。github是不一样的(api.github.com,仓库域名是github.com) ，
+私服的话需要找对应人员确认下api的域名，填写正确即可
