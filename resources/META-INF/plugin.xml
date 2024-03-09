@@ -1,6 +1,6 @@
 <idea-plugin>
   <id>com.nijunyang.idea-git.code.review</id>
-  <name>idea-git-codeReview</name>
+  <name>git-codeReview</name>
   <version>1.0</version>
   <vendor email="bluedarkni@qq.com" url="https://gitee.com/bluedarkni/idea-git-codereview-plugin">bluedarkni</vendor>
 

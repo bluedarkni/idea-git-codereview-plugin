@@ -21,7 +21,6 @@ import com.nijunyang.idea.plugin.git.codereviewer.model.github.GitHubIssueBody;
 import com.nijunyang.idea.plugin.git.codereviewer.model.gitlab.GitLabConstant;
 import com.nijunyang.idea.plugin.git.codereviewer.model.gitlab.GitLabIssueBody;
 import com.nijunyang.idea.plugin.git.codereviewer.utils.HttpUtil;
-import org.apache.commons.lang.StringUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -167,7 +166,7 @@ public class CodeReviewUI<T extends GitUser> {
 //        gitHubIssueBody.setLabels(Arrays.asList("BUG"));
         String domain = eventInfo.getDomain();
         String apiDomain = token.getApiDomain();
-        if (!StringUtils.isEmpty(apiDomain)) {
+        if (apiDomain != null && apiDomain.length() == 0) {
             domain = apiDomain;
         }
         LocalRepositoryInfo localRepositoryInfo = eventInfo.getLocalRepositoryInfo();

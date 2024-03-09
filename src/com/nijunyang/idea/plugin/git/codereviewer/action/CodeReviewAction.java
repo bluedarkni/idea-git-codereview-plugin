@@ -20,7 +20,6 @@ import com.nijunyang.idea.plugin.git.codereviewer.utils.PathUtil;
 import com.nijunyang.idea.plugin.git.codereviewer.utils.TokenUtil;
 import com.nijunyang.idea.plugin.git.codereviewer.view.CodeReviewUI;
 import com.nijunyang.idea.plugin.git.codereviewer.view.TokenConfigUI;
-import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.MessageFormat;
@@ -119,7 +118,7 @@ public class CodeReviewAction extends AnAction {
         } else if (token.getChannel() == Channel.GIT_HUB) {
             String owner = localRepositoryInfo.getGroupPath();
             String apiDomain = token.getApiDomain();
-            if (!StringUtils.isEmpty(apiDomain)) {
+            if (apiDomain != null && apiDomain.length() == 0) {
                 domain = apiDomain;
             }
             String usersUrl = HttpUtil.HTTPS_PROTOCOL + domain +
