@@ -5,20 +5,18 @@
   <vendor email="bluedarkni@qq.com" url="https://gitee.com/bluedarkni/idea-git-codereview-plugin">bluedarkni</vendor>
 
   <description><![CDATA[
-    代码检视工具：https://gitee.com/bluedarkni/idea-git-codereview-plugin。<br>
-      主要功能：<br>
-          1、 可以直接将代码检视中的问题或者意见，以issue的方式提交到代码仓库中进行跟踪修改，支持github、gitLab、gitee<br>
-      使用方式：<br>
-          1.仓库申请access token 注意token的接口权限，需要保证token权限有仓库相关信息的查询和提交issue的权限
+    Code review tool：https://gitee.com/bluedarkni/idea-git-codereview-plugin。<br>
+ Main functions：<br>
+          1.You can directly submit any issues or comments in code review to the code repository in the form of an issue for tracking and modification. Github, GitLab, and Gitee are supported. <br>
+          2.When applying for access tokens in the repository, pay attention to the interface permissions of the tokens and ensure that the token permissions have the authority to query warehouse related information and submit issues.
     ]]></description>
 
   <change-notes>
     <![CDATA[
-          代码检视工具。<br>
-      主要功能：<br>
-          1、 可以直接将代码检视中的问题或者意见，以issue的方式提交到代码仓库中进行跟踪修改，支持github、gitLab、gitee<br>
-      使用方式：<br>
-          2.仓库申请access token 注意token的接口权限，需要保证token权限有仓库相关信息的查询和提交issue的权限
+          Code review tool<br>
+      Main functions：<br>
+          1.You can directly submit any issues or comments in code review to the code repository in the form of an issue for tracking and modification. Github, GitLab, and Gitee are supported. <br>
+          2.When applying for access tokens in the repository, pay attention to the interface permissions of the tokens and ensure that the token permissions have the authority to query warehouse related information and submit issues.
     ]]>
   </change-notes>
 
