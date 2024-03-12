@@ -2,13 +2,10 @@
   <id>com.nijunyang.idea-git.code.review</id>
   <name>git-codeReview</name>
   <version>1.0</version>
-  <vendor email="bluedarkni@qq.com" url="https://github.com/bluedarkni/idea-git-codereview-plugin">bluedarkni</vendor>
+  <vendor email="bluedarkni@qq.com" url="https://gitee.com/bluedarkni/idea-git-codereview-plugin">bluedarkni</vendor>
 
   <description><![CDATA[
-    Code review tool：https://github.com/bluedarkni/idea-git-codereview-plugin。<br>
- Main functions：<br>
-          1.You can directly submit any issues or comments in code review to the code repository in the form of an issue for tracking and modification. Github, GitLab, and Gitee are supported. <br>
-          2.When applying for access tokens in the repository, pay attention to the interface permissions of the tokens and ensure that the token permissions have the authority to query warehouse related information and submit issues.
+    You can directly submit any issues or comments in code review to the code repository in the form of an issue for tracking and modification. Github, GitLab, and Gitee are supported.
     ]]></description>
 
   <change-notes>
